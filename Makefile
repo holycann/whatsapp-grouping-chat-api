@@ -1,11 +1,11 @@
 build:
-	@go build -o bin/myapi cmd/main.go
+	@go build -o bin/WGCA main.go
 
 test:
 	@go test -v ./...
 
 run:build
-	@./bin/myapi
+	@./bin/WGCA
 
 migration:
 	@migrate create -ext sql -dir db/migrations $(filter-out $@,$(MAKECMDGOALS))
