@@ -1,5 +1,7 @@
 package models
 
+import "google.golang.org/protobuf/types/known/timestamppb"
+
 type ChatStore interface {
 	GetAllChat() ([]*Chat, error)
 	GetChatByID(id int) (*Chat, error)
@@ -9,14 +11,20 @@ type ChatStore interface {
 }
 
 type Chat struct {
-	ID      int    `json:"id"`
-	Message string `json:"message"`
+	ID        int                   `json:"id"`
+	UserID    int                   `json:"user_id"`
+	Message   string                `json:"message"`
+	CreatedAt timestamppb.Timestamp `json:"created_at"`
+	UpdatedAt timestamppb.Timestamp `json:"updated_at"`
 }
 
 type CreateChatPayload struct {
-	Message string `json:"name" validate:"required"`
+	Message   string                `json:"name" validate:"required"`
+	CreatedAt timestamppb.Timestamp `json:"created_at"`
 }
 
 type UpdateChatPayload struct {
-	Message string `json:"name" validate:"required"`
+	ID        int                   `json:"id"`
+	Message   string                `json:"name" validate:"required"`
+	UpdatedAt timestamppb.Timestamp `json:"updated_at"`
 }

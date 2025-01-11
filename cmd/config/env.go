@@ -28,7 +28,7 @@ func initConfig() Config {
 			getEnv("DB_HOST", "localhost"),
 			getEnv("DB_PORT", "3306"),
 		),
-		DBName: getEnv("DB_NAME", "myapi"),
+		DBName: getEnv("DB_NAME", "WGCA"),
 	}
 }
 
