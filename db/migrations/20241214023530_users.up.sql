@@ -1,6 +1,0 @@
-CREATE TABLE IF NOT EXISTS users (
-    id SERIAL PRIMARY KEY,
-    name VARCHAR(50) NOT NULL UNIQUE,
-    phone_number VARCHAR(20) NOT NULL UNIQUE,
-    image_url VARCHAR(255)
-)
