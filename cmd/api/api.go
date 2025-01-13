@@ -7,6 +7,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/holycann/whatsapp-grouping-chat-api/services/chat"
+	"github.com/holycann/whatsapp-grouping-chat-api/services/folder"
 	"github.com/holycann/whatsapp-grouping-chat-api/services/user"
 )
 
@@ -33,6 +34,10 @@ func (s *APIServer) Run() error {
 	chatStore := chat.NewStore(s.db)
 	chatHandler := chat.NewHandler(chatStore)
 	chatHandler.ChatRoutes(subrouter)
+
+	folderStore := folder.NewStore(s.db)
+	folderHandler := folder.NewHandler(folderStore)
+	folderHandler.FolderRoutes(subrouter)
 
 	log.Print("Listening On Port ", s.addr)
 

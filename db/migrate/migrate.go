@@ -4,32 +4,30 @@ import (
 	"log"
 	"os"
 
-	sqlDriver "github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
-	sqlMigrate "github.com/golang-migrate/migrate/v4/database/mysql"
+	sqlMigrate "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/holycann/whatsapp-grouping-chat-api/cmd/config"
 	"github.com/holycann/whatsapp-grouping-chat-api/db"
 )
 
 func main() {
-	db, err := db.NewMySQLStorage(sqlDriver.Config{
-		User:                 config.Env.DBUser,
-		Passwd:               config.Env.DBPassword,
-		Addr:                 config.Env.DBAddress,
-		DBName:               config.Env.DBName,
-		Net:                  "tcp",
-		AllowNativePasswords: true,
-		ParseTime:            true,
-	})
+	// Gunakan PostgreSQL storage
+	db, err := db.NewPostgresStorage(config.Env.DBAddress, config.Env.MaxOpenConns, config.Env.MaxIdleConns, config.Env.MaxIdleTime)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	driver, _ := sqlMigrate.WithInstance(db, &sqlMigrate.Config{})
+	// Gunakan driver PostgreSQL
+	driver, err := sqlMigrate.WithInstance(db, &sqlMigrate.Config{})
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Gunakan file source untuk migrations
 	m, err := migrate.NewWithDatabaseInstance(
-		"file://db/migrations",
-		"mysql",
+		"file://db/migrations", // Lokasi folder migration
+		"postgres",             // Database yang digunakan adalah PostgreSQL
 		driver,
 	)
 
@@ -37,8 +35,10 @@ func main() {
 		log.Fatal(err)
 	}
 
-	cmd := os.Args[(len(os.Args) - 1)]
+	// Ambil perintah dari argumen
+	cmd := os.Args[len(os.Args)-1]
 
+	// Eksekusi perintah 'up' atau 'down' untuk migrasi
 	if cmd == "up" {
 		if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 			log.Fatal(err)

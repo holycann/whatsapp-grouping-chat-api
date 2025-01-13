@@ -59,18 +59,18 @@ func (h *Handler) HandleGetByID(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 	var payload models.CreateChatPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
-		fmt.Printf("error parsing json: %v\n", err)
-		utils.WriteError(w, http.StatusBadRequest, err)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error parsing json: %v", err))
+		return
 	}
 
 	if err := utils.Validate.Struct(payload); err != nil {
 		fmt.Printf("error validating payload: %v\n", err)
-		errors := err.(validator.ValidationErrors)
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", errors))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", err.(validator.ValidationErrors)))
 		return
 	}
 
 	err := h.store.CreateChat(&models.Chat{
+		UserID:  payload.UserID,
 		Message: payload.Message,
 	})
 	if err != nil {
@@ -85,8 +85,8 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	var payload models.UpdateChatPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
-		fmt.Printf("error parsing json: %v\n", err)
-		utils.WriteError(w, http.StatusBadRequest, err)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error parsing json: %v", err))
+		return
 	}
 
 	vars := mux.Vars(r)
@@ -100,8 +100,7 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if err := utils.Validate.Struct(payload); err != nil {
 		fmt.Printf("error validating payload: %v\n", err)
-		errors := err.(validator.ValidationErrors)
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", errors))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", err.(validator.ValidationErrors)))
 		return
 	}
 
@@ -124,6 +123,7 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	err = h.store.UpdateChat(&models.Chat{
 		ID:      payload.ID,
+		UserID:  payload.UserID,
 		Message: payload.Message,
 	})
 	if err != nil {

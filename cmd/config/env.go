@@ -7,28 +7,48 @@ import (
 )
 
 type Config struct {
-	PublicHost string
-	Port       string
-	DBUser     string
-	DBPassword string
-	DBAddress  string
-	DBName     string
+	PublicHost   string
+	Port         string
+	DBAddress    string
+	MaxOpenConns int64
+	MaxIdleConns int64
+	MaxIdleTime  int64
 }
 
-var Env = initConfig()
+var Env = initConfigStaging()
 
-func initConfig() Config {
+func initConfigProduction() Config {
 	return Config{
 		PublicHost: getEnv("PUBLIC_HOST", "http://localhost"),
 		Port:       getEnv("PORT", "8080"),
-		DBUser:     getEnv("DB_USER", "root"),
-		DBPassword: getEnv("DB_PASSWORD", ""),
 		DBAddress: fmt.Sprintf(
-			"%s:%s",
-			getEnv("DB_HOST", "localhost"),
-			getEnv("DB_PORT", "3306"),
+			"postgres://%s:%s@%s/%s",
+			getEnv("DB_USER", "holycan"),
+			getEnv("DB_PASSWORD", "Vjh38sroTQql"),
+			getEnv("DB_HOST", "ep-mute-forest-a1sttr12.ap-southeast-1.pg.koyeb.app"),
+			getEnv("DB_NAME", "koyebdb"),
 		),
-		DBName: getEnv("DB_NAME", "WGCA"),
+		MaxOpenConns: getEnvAsInt("DB_MAX_OPEN_CONNS", 30),
+		MaxIdleConns: getEnvAsInt("DB_MAX_IDLE_CONNS", 30),
+		MaxIdleTime:  getEnvAsInt("DB_MAX_IDLE_TIME", 5),
+	}
+}
+
+func initConfigStaging() Config {
+	return Config{
+		PublicHost: getEnv("PUBLIC_HOST", "http://localhost"),
+		Port:       getEnv("PORT", "8080"),
+		DBAddress: fmt.Sprintf(
+			"postgres://%s:%s@%s/%s?sslmode=%s",
+			getEnv("DB_USER", "postgres"),
+			getEnv("DB_PASSWORD", "ramaa212!"),
+			getEnv("DB_HOST", "localhost:5432"),
+			getEnv("DB_NAME", "postgres"),
+			getEnv("SSL_MODE", "disable"),
+		),
+		MaxOpenConns: getEnvAsInt("DB_MAX_OPEN_CONNS", 30),
+		MaxIdleConns: getEnvAsInt("DB_MAX_IDLE_CONNS", 30),
+		MaxIdleTime:  getEnvAsInt("DB_MAX_IDLE_TIME", 5),
 	}
 }
 

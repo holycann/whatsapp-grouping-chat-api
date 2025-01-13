@@ -11,7 +11,7 @@ migration:
 	@migrate create -ext sql -dir db/migrations $(filter-out $@,$(MAKECMDGOALS))
 
 migrate-up:
-	@go run cmd/migrate/migrate.go up
+	@go run db/migrate/migrate.go up
 
 migrate-down:
-	@go run cmd/migrate/migrate.go down
+	@go run db/migrate/migrate.go down

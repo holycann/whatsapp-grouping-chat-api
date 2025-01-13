@@ -22,7 +22,8 @@ func scanRowIntoUser(row *sql.Rows) (*models.User, error) {
 
 	err := row.Scan(
 		&user.ID,
-		&user.Username,
+		&user.Name,
+		&user.PhoneNumber,
 		&user.ImageURL,
 	)
 	if err != nil {
@@ -32,8 +33,25 @@ func scanRowIntoUser(row *sql.Rows) (*models.User, error) {
 	return user, nil
 }
 
-func (s *Store) GetUserByUsername(username string) (*models.User, error) {
-	rows, err := s.db.Query("SELECT * FROM users WHERE username = ?", username)
+func (s *Store) GetAllUser() (users []*models.User, err error) {
+	rows, err := s.db.Query("SELECT * FROM users")
+	if err != nil {
+		return nil, err
+	}
+
+	for rows.Next() {
+		u, err := scanRowIntoUser(rows)
+		if err != nil {
+			return nil, err
+		}
+		users = append(users, u)
+	}
+
+	return users, nil
+}
+
+func (s *Store) GetUserByUsername(name string) (*models.User, error) {
+	rows, err := s.db.Query("SELECT * FROM users WHERE name = $1", name)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +64,7 @@ func (s *Store) GetUserByUsername(username string) (*models.User, error) {
 		}
 	}
 
-	if u.Username == "" {
+	if u.Name == "" {
 		return nil, fmt.Errorf("User not found")
 	}
 
@@ -54,7 +72,7 @@ func (s *Store) GetUserByUsername(username string) (*models.User, error) {
 }
 
 func (s *Store) GetUserByID(id int) (*models.User, error) {
-	rows, err := s.db.Query("SELECT * FROM users WHERE id = ?", id)
+	rows, err := s.db.Query("SELECT * FROM users WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +93,7 @@ func (s *Store) GetUserByID(id int) (*models.User, error) {
 }
 
 func (s *Store) CreateUser(user *models.User) error {
-	_, err := s.db.Exec("INSERT INTO users (username, image_url VALUES (?, ?)", user.Username, user.ImageURL)
+	_, err := s.db.Exec("INSERT INTO users (name, phone_number, image_url) VALUES ($1, $2, $3)", user.Name, user.PhoneNumber, user.ImageURL)
 	if err != nil {
 		return err
 	}
@@ -84,7 +102,7 @@ func (s *Store) CreateUser(user *models.User) error {
 }
 
 func (s *Store) UpdateUser(user *models.UpdateUserPayload) error {
-	_, err := s.db.Exec("UPDATE users SET `username` = ?, `image_url` = ? WHERE id = ?", user.Username, user.ImageURL, user.ID)
+	_, err := s.db.Exec("UPDATE users SET name = $1, phone_number = $2, image_url = $3 WHERE id = $4", user.Name, user.PhoneNumber, user.ImageURL, user.ID)
 	if err != nil {
 		return err
 	}
@@ -93,7 +111,7 @@ func (s *Store) UpdateUser(user *models.UpdateUserPayload) error {
 }
 
 func (s *Store) DeleteUser(id int) error {
-	_, err := s.db.Exec("DELETE FROM users WHERE id = ?", id)
+	_, err := s.db.Exec("DELETE FROM users WHERE id = $1", id)
 	if err != nil {
 		return err
 	}

@@ -20,30 +20,64 @@ func NewHandler(store models.UserStore) *Handler {
 }
 
 func (h *Handler) UserRoutes(router *mux.Router) {
+	router.HandleFunc("/user", h.HandleGet).Methods("GET")
+	router.HandleFunc("/user/{id}", h.HandleGetByID).Methods("GET")
 	router.HandleFunc("/user", h.HandleCreate).Methods("POST")
+	router.HandleFunc("/user/{id}", h.HandleUpdate).Methods("PUT")
+	router.HandleFunc("/user/{id}", h.HandleDelete).Methods("DELETE")
+}
+
+func (h *Handler) HandleGet(w http.ResponseWriter, r *http.Request) {
+	chats, err := h.store.GetAllUser()
+	if err != nil {
+		fmt.Printf("error getting all user: %v\n", err)
+		utils.WriteError(w, http.StatusInternalServerError, fmt.Errorf("Failed to retrieve users"))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, chats)
+}
+
+func (h *Handler) HandleGetByID(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	id, err := strconv.Atoi(vars["id"])
+	if err != nil || id <= 0 {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid ID parameter"))
+		return
+	}
+
+	chat, err := h.store.GetUserByID(id)
+	if err != nil || id <= 0 {
+		fmt.Printf("error getting user by id: %v\n", err)
+		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("User with ID %d not found", id))
+		return
+	}
+
+	utils.WriteJSON(w, http.StatusOK, chat)
 }
 
 func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 	var payload models.CreateUserPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
-		utils.WriteError(w, http.StatusBadRequest, err)
-	}
-
-	if err := utils.Validate.Struct(payload); err != nil {
-		errors := err.(validator.ValidationErrors)
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", errors))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error parsing json: %v\n", err))
 		return
 	}
 
-	_, err := h.store.GetUserByUsername(payload.Username)
+	if err := utils.Validate.Struct(payload); err != nil {
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", err.(validator.ValidationErrors)))
+		return
+	}
+
+	_, err := h.store.GetUserByUsername(payload.Name)
 	if err == nil {
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("username %s already exists", payload.Username))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Name %s already exists", payload.Name))
 		return
 	}
 
 	err = h.store.CreateUser(&models.User{
-		Username: payload.Username,
-		ImageURL: payload.ImageURL,
+		Name:        payload.Name,
+		PhoneNumber: payload.PhoneNumber,
+		ImageURL:    payload.ImageURL,
 	})
 	if err != nil {
 		fmt.Printf("error create user: %v\n", err)
@@ -51,14 +85,14 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, nil)
+	utils.WriteJSON(w, http.StatusCreated, fmt.Sprintf("Create user %s successfully", payload.Name))
 }
 
 func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 	var payload models.UpdateUserPayload
 	if err := utils.ParseJSON(r, &payload); err != nil {
-		fmt.Printf("error parsing json: %v\n", err)
-		utils.WriteError(w, http.StatusBadRequest, err)
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("error parsing json: %v", err))
+		return
 	}
 
 	vars := mux.Vars(r)
@@ -72,8 +106,7 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	if err := utils.Validate.Struct(payload); err != nil {
 		fmt.Printf("error validating payload: %v\n", err)
-		errors := err.(validator.ValidationErrors)
-		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", errors))
+		utils.WriteError(w, http.StatusBadRequest, fmt.Errorf("Invalid Payload %v", err.(validator.ValidationErrors)))
 		return
 	}
 
@@ -89,14 +122,14 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if payload.Username == "" && payload.PhoneNumber == "" {
+	if payload.Name == "" && payload.PhoneNumber == "" {
 		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("Username And Phone Number Cannot Be Empty!"))
 		return
 	}
 
 	err = h.store.UpdateUser(&models.UpdateUserPayload{
 		ID:          payload.ID,
-		Username:    payload.Username,
+		Name:        payload.Name,
 		PhoneNumber: payload.PhoneNumber,
 		ImageURL:    payload.ImageURL,
 	})
@@ -106,7 +139,7 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusOK, fmt.Sprintf("Update user %s successfully", u.Username))
+	utils.WriteJSON(w, http.StatusOK, fmt.Sprintf("Update user %s successfully", u.Name))
 }
 
 func (h *Handler) HandleDelete(w http.ResponseWriter, r *http.Request) {

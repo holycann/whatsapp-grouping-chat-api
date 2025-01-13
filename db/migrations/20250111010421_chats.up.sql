@@ -1,7 +1,8 @@
-CREATE TABLE IF NOT EXITS chats(
-    `id`  INT UNSIGNED NOT NULL AUTO_INCREMENT
-    `user_id` INT UNSIGNED NOT NULL,
-    `message` TEXT NOT NULL,
-    `created_at` TIMESTAMP,
-    `updated_at` TIMESTAMP
-)
+CREATE TABLE IF NOT EXISTS chats (
+    id  SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT NULL,
+    CONSTRAINT fk_chats_user FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+);

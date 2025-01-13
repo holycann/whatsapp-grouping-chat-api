@@ -1,25 +1,18 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"log"
+	"time"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/holycann/whatsapp-grouping-chat-api/cmd/api"
 	"github.com/holycann/whatsapp-grouping-chat-api/cmd/config"
 	"github.com/holycann/whatsapp-grouping-chat-api/db"
 )
 
 func main() {
-	db, err := db.NewMySQLStorage(mysql.Config{
-		User:                 config.Env.DBUser,
-		Passwd:               config.Env.DBPassword,
-		Addr:                 config.Env.DBAddress,
-		DBName:               config.Env.DBName,
-		Net:                  "tcp",
-		AllowNativePasswords: true,
-		ParseTime:            true,
-	})
+	db, err := db.NewPostgresStorage(config.Env.DBAddress, config.Env.MaxOpenConns, config.Env.MaxIdleConns, config.Env.MaxIdleTime)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,9 +26,13 @@ func main() {
 }
 
 func initStorage(db *sql.DB) {
-	err := db.Ping()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := db.PingContext(ctx)
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	log.Println("Connected to database")
 }

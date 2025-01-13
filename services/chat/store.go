@@ -22,7 +22,10 @@ func scanRowIntoChat(row *sql.Rows) (*models.Chat, error) {
 
 	err := row.Scan(
 		&chat.ID,
+		&chat.UserID,
 		&chat.Message,
+		&chat.CreatedAt,
+		&chat.UpdatedAt,
 	)
 	if err != nil {
 		return nil, err
@@ -32,7 +35,7 @@ func scanRowIntoChat(row *sql.Rows) (*models.Chat, error) {
 }
 
 func (s *Store) GetAllChat() ([]*models.Chat, error) {
-	rows, err := s.db.Query("SELECT * FROM chat")
+	rows, err := s.db.Query("SELECT * FROM chats")
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +54,7 @@ func (s *Store) GetAllChat() ([]*models.Chat, error) {
 }
 
 func (s *Store) GetChatByID(id int) (*models.Chat, error) {
-	rows, err := s.db.Query("SELECT * FROM chat WHERE id = ?", id)
+	rows, err := s.db.Query("SELECT * FROM chats WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
@@ -72,7 +75,7 @@ func (s *Store) GetChatByID(id int) (*models.Chat, error) {
 }
 
 func (s *Store) CreateChat(chat *models.Chat) error {
-	_, err := s.db.Exec("INSERT INTO chat (`message`) VALUES (?)", chat.Message)
+	_, err := s.db.Exec("INSERT INTO chats (user_id, message) VALUES ($1, $2)", chat.UserID, chat.Message)
 	if err != nil {
 		return err
 	}
@@ -81,7 +84,7 @@ func (s *Store) CreateChat(chat *models.Chat) error {
 }
 
 func (s *Store) UpdateChat(chat *models.Chat) error {
-	_, err := s.db.Exec("UPDATE chat SET `message` = ? WHERE id = ?", chat.Message, chat.ID)
+	_, err := s.db.Exec("UPDATE chats SET user_id = $1, message = $2 WHERE id = $3", chat.UserID, chat.Message, chat.ID)
 	if err != nil {
 		return err
 	}
@@ -90,7 +93,7 @@ func (s *Store) UpdateChat(chat *models.Chat) error {
 }
 
 func (s *Store) DeleteChat(id int) error {
-	_, err := s.db.Exec("DELETE FROM chat WHERE id = ?", id)
+	_, err := s.db.Exec("DELETE FROM chats WHERE id = $1", id)
 	if err != nil {
 		return err
 	}

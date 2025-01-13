@@ -22,8 +22,8 @@ func scanRowIntoFolder(row *sql.Rows) (*models.Folder, error) {
 
 	err := row.Scan(
 		&folder.ID,
-		&folder.ChatID,
 		&folder.Name,
+		&folder.ChatID,
 		&folder.CreatedAt,
 		&folder.UpdatedAt,
 	)
@@ -34,50 +34,67 @@ func scanRowIntoFolder(row *sql.Rows) (*models.Folder, error) {
 	return folder, nil
 }
 
-func (s *Store) GetFolderByName(name string) (*models.Folder, error) {
-	rows, err := s.db.Query("SELECT * FROM folders WHERE name = ?", name)
+func (s *Store) GetAllFolder() (folder []*models.Folder, err error) {
+	rows, err := s.db.Query("SELECT * FROM folders")
 	if err != nil {
 		return nil, err
 	}
 
-	u := new(models.Folder)
 	for rows.Next() {
-		u, err = scanRowIntoFolder(rows)
+		f, err := scanRowIntoFolder(rows)
+		if err != nil {
+			return nil, err
+		}
+		folder = append(folder, f)
+	}
+
+	return folder, nil
+}
+
+func (s *Store) GetFolderByName(name string) (*models.Folder, error) {
+	rows, err := s.db.Query("SELECT * FROM folders WHERE name = $1", name)
+	if err != nil {
+		return nil, err
+	}
+
+	f := new(models.Folder)
+	for rows.Next() {
+		f, err = scanRowIntoFolder(rows)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if u.Name == "" {
+	if f.Name == "" {
 		return nil, fmt.Errorf("Folder not found")
 	}
 
-	return u, nil
+	return f, nil
 }
 
 func (s *Store) GetFolderByID(id int) (*models.Folder, error) {
-	rows, err := s.db.Query("SELECT * FROM folders WHERE id = ?", id)
+	rows, err := s.db.Query("SELECT * FROM folders WHERE id = $1", id)
 	if err != nil {
 		return nil, err
 	}
 
-	u := new(models.Folder)
+	f := new(models.Folder)
 	for rows.Next() {
-		u, err = scanRowIntoFolder(rows)
+		f, err = scanRowIntoFolder(rows)
 		if err != nil {
 			return nil, err
 		}
 	}
 
-	if u.ID == 0 {
+	if f.ID == 0 {
 		return nil, fmt.Errorf("Folder not found")
 	}
 
-	return u, nil
+	return f, nil
 }
 
-func (s *Store) CreateFolder(folder *models.Folder) error {
-	_, err := s.db.Exec("INSERT INTO folders (chat_id, name, created_at VALUES (?, ?, ?)", folder.ChatID, folder.Name, folder.CreatedAt)
+func (s *Store) CreateFolder(folder *models.CreateFolderPayload) error {
+	_, err := s.db.Exec("INSERT INTO folders (chat_id, name) VALUES ($1, $2)", folder.ChatID, folder.Name)
 	if err != nil {
 		return err
 	}
@@ -86,7 +103,7 @@ func (s *Store) CreateFolder(folder *models.Folder) error {
 }
 
 func (s *Store) UpdateFolder(folder *models.UpdateFolderPayload) error {
-	_, err := s.db.Exec("UPDATE folders SET `chat_id` = ?, `name` = ?, `updated_at` = ? WHERE id = ?", folder.ChatID, folder.Name, folder.ID)
+	_, err := s.db.Exec("UPDATE folders SET chat_id = $1, name = $2 WHERE id = $3", folder.ChatID, folder.Name, folder.ID)
 	if err != nil {
 		return err
 	}
@@ -95,7 +112,7 @@ func (s *Store) UpdateFolder(folder *models.UpdateFolderPayload) error {
 }
 
 func (s *Store) DeleteFolder(id int) error {
-	_, err := s.db.Exec("DELETE FROM folders WHERE id = ?", id)
+	_, err := s.db.Exec("DELETE FROM folders WHERE id = $1", id)
 	if err != nil {
 		return err
 	}

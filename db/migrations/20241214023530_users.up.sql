@@ -1,7 +1,6 @@
 CREATE TABLE IF NOT EXISTS users (
-    `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    `name` VARCHAR(50) NOT NULL UNIQUE,
-    `phone_number` VARCHAR(20) NOT NULL UNIQUE,
-    `image_url` VARCHAR(255),
-    PRIMARY KEY (`id`)
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    phone_number VARCHAR(20) NOT NULL UNIQUE,
+    image_url VARCHAR(255)
 )

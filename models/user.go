@@ -1,6 +1,7 @@
 package models
 
 type UserStore interface {
+	GetAllUser() ([]*User, error)
 	GetUserByUsername(username string) (*User, error)
 	GetUserByID(id int) (*User, error)
 	CreateUser(user *User) error
@@ -10,20 +11,20 @@ type UserStore interface {
 
 type User struct {
 	ID          int    `json:"id"`
-	Username    string `json:"username"`
+	Name        string `json:"name"`
 	PhoneNumber string `json:"phone_number"`
 	ImageURL    string `json:"image"`
 }
 
 type CreateUserPayload struct {
-	Username    string `json:"username" validate:"required,min=3,max=30"`
+	Name        string `json:"name" validate:"required,min=3,max=30"`
 	PhoneNumber string `json:"phone_number" validate:"required,min=3,max=20"`
-	ImageURL    string `json:"image"`
+	ImageURL    string `json:"image_url"`
 }
 
 type UpdateUserPayload struct {
 	ID          int    `json:"id" validate:"required"`
-	Username    string `json:"username" validate:"required, min=3,max=30"`
-	PhoneNumber string `json:"phone_number" validate:"required, min=3,max=20"`
-	ImageURL    string `json:"image"`
+	Name        string `json:"name" validate:"required,min=3,max=30"`
+	PhoneNumber string `json:"phone_number" validate:"required,min=3,max=20"`
+	ImageURL    string `json:"image_url"`
 }

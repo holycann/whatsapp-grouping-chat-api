@@ -1,34 +1,31 @@
 package models
 
-import (
-	"google.golang.org/protobuf/types/known/timestamppb"
-)
+import "database/sql"
 
 type FolderStore interface {
-	GetFolderByName(name string) (*Folder, error)
+	GetAllFolder() ([]*Folder, error)
 	GetFolderByID(id int) (*Folder, error)
+	GetFolderByName(name string) (*Folder, error)
 	CreateFolder(Folder *CreateFolderPayload) error
 	UpdateFolder(Folder *UpdateFolderPayload) error
 	DeleteFolder(id int) error
 }
 
 type Folder struct {
-	ID        int                   `json:"id"`
-	ChatID    int                   `json:"chat_id"`
-	Name      string                `json:"name"`
-	CreatedAt timestamppb.Timestamp `json:"created_at"`
-	UpdatedAt timestamppb.Timestamp `json:"updated_at"`
+	ID        int          `json:"id"`
+	ChatID    int          `json:"chat_id"`
+	Name      string       `json:"name"`
+	CreatedAt sql.NullTime `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
 }
 
 type CreateFolderPayload struct {
-	ChatID    int                   `json:"chat_id" validate:"required"`
-	Name      string                `json:"name" validate:"required, min=3, max=30"`
-	CreatedAt timestamppb.Timestamp `json:"created_at" validate:"required"`
+	ChatID int    `json:"chat_id" validate:"required"`
+	Name   string `json:"name" validate:"required,min=3,max=30"`
 }
 
 type UpdateFolderPayload struct {
-	ID        int                   `json:"id" validate:"required"`
-	ChatID    int                   `json:"chat_id" validate:"required"`
-	Name      string                `json:"name" validate:"required, min=3, max=30"`
-	UpdatedAt timestamppb.Timestamp `json:"updated_at" validate:"required"`
+	ID     int    `json:"id" validate:"required"`
+	ChatID int    `json:"chat_id" validate:"required"`
+	Name   string `json:"name" validate:"required,min=3,max=30"`
 }
