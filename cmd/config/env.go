@@ -19,7 +19,7 @@ var Env = initConfigProduction()
 
 func initConfigProduction() Config {
 	return Config{
-		PublicHost: getEnv("PUBLIC_HOST", "http://localhost"),
+		PublicHost: getEnv("PUBLIC_HOST", "https://wise-sheena-holycan-e9914987.koyeb.app"),
 		Port:       getEnv("PORT", "8080"),
 		DBAddress: fmt.Sprintf(
 			"postgres://%s:%s@%s/%s",
