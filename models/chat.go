@@ -16,8 +16,8 @@ type Chat struct {
 	ID        int          `json:"id"`
 	UserID    int          `json:"user_id"`
 	Message   string       `json:"message"`
-	CreatedAt string       `json:"Created_at"`
-	UpdatedAt sql.NullTime `json:"Updated_at"`
+	CreatedAt string       `json:"created_at"`
+	UpdatedAt sql.NullTime `json:"updated_at"`
 }
 
 type CreateChatPayload struct {

@@ -41,14 +41,14 @@ func (s *APIServer) Run() error {
 	folderHandler.FolderRoutes(subrouter)
 
 	corsMiddleware := handlers.CORS(
-		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedOrigins([]string{"http://127.0.0.1:5500"}), // Pastikan domain sesuai
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
 
-	router.Use(corsMiddleware)
+	handlerWithCORS := corsMiddleware(router)
 
 	log.Print("Listening On Port ", s.addr)
 
-	return http.ListenAndServe(s.addr, router)
+	return http.ListenAndServe(s.addr, handlerWithCORS)
 }
