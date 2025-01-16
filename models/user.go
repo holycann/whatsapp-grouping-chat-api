@@ -13,7 +13,7 @@ type User struct {
 	ID          int    `json:"id"`
 	Name        string `json:"name"`
 	PhoneNumber string `json:"phone_number"`
-	ImageURL    string `json:"image"`
+	ImageURL    string `json:"image_url"`
 }
 
 type CreateUserPayload struct {

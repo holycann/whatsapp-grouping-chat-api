@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/holycann/whatsapp-grouping-chat-api/services/chat"
 	"github.com/holycann/whatsapp-grouping-chat-api/services/folder"
@@ -38,6 +39,14 @@ func (s *APIServer) Run() error {
 	folderStore := folder.NewStore(s.db)
 	folderHandler := folder.NewHandler(folderStore)
 	folderHandler.FolderRoutes(subrouter)
+
+	corsMiddleware := handlers.CORS(
+		handlers.AllowedOrigins([]string{"*"}),
+		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
+	)
+
+	router.Use(corsMiddleware)
 
 	log.Print("Listening On Port ", s.addr)
 
