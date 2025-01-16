@@ -13,19 +13,16 @@ type FolderStore interface {
 
 type Folder struct {
 	ID        int          `json:"id"`
-	ChatID    int          `json:"chat_id"`
 	Name      string       `json:"name"`
 	CreatedAt sql.NullTime `json:"created_at"`
 	UpdatedAt sql.NullTime `json:"updated_at"`
 }
 
 type CreateFolderPayload struct {
-	ChatID int    `json:"chat_id" validate:"required"`
-	Name   string `json:"name" validate:"required,min=3,max=30"`
+	Name string `json:"name" validate:"required,min=3,max=30"`
 }
 
 type UpdateFolderPayload struct {
-	ID     int    `json:"id" validate:"required"`
-	ChatID int    `json:"chat_id" validate:"required"`
-	Name   string `json:"name" validate:"required,min=3,max=30"`
+	ID   int    `json:"id" validate:"required"`
+	Name string `json:"name" validate:"required,min=3,max=30"`
 }

@@ -69,9 +69,10 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := h.store.CreateChat(&models.Chat{
-		UserID:  payload.UserID,
-		Message: payload.Message,
+	err := h.store.CreateChat(&models.CreateChatPayload{
+		UserID:   payload.UserID,
+		FolderID: payload.FolderID,
+		Message:  payload.Message,
 	})
 	if err != nil {
 		fmt.Printf("error create chat: %v\n", err)
@@ -121,10 +122,11 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.store.UpdateChat(&models.Chat{
-		ID:      payload.ID,
-		UserID:  payload.UserID,
-		Message: payload.Message,
+	err = h.store.UpdateChat(&models.UpdateChatPayload{
+		ID:       payload.ID,
+		UserID:   payload.UserID,
+		FolderID: payload.FolderID,
+		Message:  payload.Message,
 	})
 	if err != nil {
 		fmt.Printf("error update chat: %v\n", err)

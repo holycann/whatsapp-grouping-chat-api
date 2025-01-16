@@ -75,8 +75,7 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	err = h.store.CreateFolder(&models.CreateFolderPayload{
-		ChatID: payload.ChatID,
-		Name:   payload.Name,
+		Name: payload.Name,
 	})
 	if err != nil {
 		fmt.Printf("error create folder: %v\n", err)
@@ -121,15 +120,9 @@ func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if payload.ChatID <= 0 && payload.Name == "" {
-		utils.WriteError(w, http.StatusNotFound, fmt.Errorf("Invalid ChatID And Phone Number Cannot Be Empty!"))
-		return
-	}
-
 	err = h.store.UpdateFolder(&models.UpdateFolderPayload{
-		ID:     payload.ID,
-		ChatID: payload.ChatID,
-		Name:   payload.Name,
+		ID:   payload.ID,
+		Name: payload.Name,
 	})
 	if err != nil {
 		fmt.Printf("error update chat: %v\n", err)

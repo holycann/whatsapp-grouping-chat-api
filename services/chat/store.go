@@ -23,6 +23,7 @@ func scanRowIntoChat(row *sql.Rows) (*models.Chat, error) {
 	err := row.Scan(
 		&chat.ID,
 		&chat.UserID,
+		&chat.FolderID,
 		&chat.Message,
 		&chat.CreatedAt,
 		&chat.UpdatedAt,
@@ -74,8 +75,8 @@ func (s *Store) GetChatByID(id int) (*models.Chat, error) {
 	return r, nil
 }
 
-func (s *Store) CreateChat(chat *models.Chat) error {
-	_, err := s.db.Exec("INSERT INTO chats (user_id, message) VALUES ($1, $2)", chat.UserID, chat.Message)
+func (s *Store) CreateChat(chat *models.CreateChatPayload) error {
+	_, err := s.db.Exec("INSERT INTO chats (user_id, folder_id, message) VALUES ($1, $2, $3)", chat.UserID, chat.FolderID, chat.Message)
 	if err != nil {
 		return err
 	}
@@ -83,8 +84,8 @@ func (s *Store) CreateChat(chat *models.Chat) error {
 	return nil
 }
 
-func (s *Store) UpdateChat(chat *models.Chat) error {
-	_, err := s.db.Exec("UPDATE chats SET user_id = $1, message = $2 WHERE id = $3", chat.UserID, chat.Message, chat.ID)
+func (s *Store) UpdateChat(chat *models.UpdateChatPayload) error {
+	_, err := s.db.Exec("UPDATE chats SET user_id = $1, folder_id = $2, message = $3 WHERE id = $4", chat.UserID, chat.FolderID, chat.Message, chat.ID)
 	if err != nil {
 		return err
 	}

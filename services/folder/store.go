@@ -23,7 +23,6 @@ func scanRowIntoFolder(row *sql.Rows) (*models.Folder, error) {
 	err := row.Scan(
 		&folder.ID,
 		&folder.Name,
-		&folder.ChatID,
 		&folder.CreatedAt,
 		&folder.UpdatedAt,
 	)
@@ -94,7 +93,7 @@ func (s *Store) GetFolderByID(id int) (*models.Folder, error) {
 }
 
 func (s *Store) CreateFolder(folder *models.CreateFolderPayload) error {
-	_, err := s.db.Exec("INSERT INTO folders (chat_id, name) VALUES ($1, $2)", folder.ChatID, folder.Name)
+	_, err := s.db.Exec("INSERT INTO folders (name) VALUES ($1)", folder.Name)
 	if err != nil {
 		return err
 	}
@@ -103,7 +102,7 @@ func (s *Store) CreateFolder(folder *models.CreateFolderPayload) error {
 }
 
 func (s *Store) UpdateFolder(folder *models.UpdateFolderPayload) error {
-	_, err := s.db.Exec("UPDATE folders SET chat_id = $1, name = $2 WHERE id = $3", folder.ChatID, folder.Name, folder.ID)
+	_, err := s.db.Exec("UPDATE folders SET name = $1 WHERE id = $2", folder.Name, folder.ID)
 	if err != nil {
 		return err
 	}

@@ -15,7 +15,7 @@ type Config struct {
 	MaxIdleTime  int64
 }
 
-var Env = initConfigProduction()
+var Env = initConfigStaging()
 
 func initConfigProduction() Config {
 	return Config{
