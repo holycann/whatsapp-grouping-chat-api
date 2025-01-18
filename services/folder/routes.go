@@ -74,7 +74,7 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = h.store.CreateFolder(&models.CreateFolderPayload{
+	id, err := h.store.CreateFolder(&models.CreateFolderPayload{
 		Name: payload.Name,
 	})
 	if err != nil {
@@ -83,7 +83,9 @@ func (h *Handler) HandleCreate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	utils.WriteJSON(w, http.StatusCreated, fmt.Sprintf("Create folder %s successfully", payload.Name))
+	payload.ID = id
+
+	utils.WriteJSON(w, http.StatusCreated, payload)
 }
 
 func (h *Handler) HandleUpdate(w http.ResponseWriter, r *http.Request) {

@@ -92,13 +92,18 @@ func (s *Store) GetFolderByID(id int) (*models.Folder, error) {
 	return f, nil
 }
 
-func (s *Store) CreateFolder(folder *models.CreateFolderPayload) error {
-	_, err := s.db.Exec("INSERT INTO folders (name) VALUES ($1)", folder.Name)
+func (s *Store) CreateFolder(folder *models.CreateFolderPayload) (int64, error) {
+	f, err := s.db.Exec("INSERT INTO folders (name) VALUES ($1)", folder.Name)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	return nil
+	lastInsertID, err := f.LastInsertId()
+	if err != nil {
+		return 0, nil
+	}
+
+	return lastInsertID, nil
 }
 
 func (s *Store) UpdateFolder(folder *models.UpdateFolderPayload) error {
