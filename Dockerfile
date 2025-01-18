@@ -3,7 +3,7 @@ FROM golang:1.23-alpine
 
 # Install dependencies dan air (alat untuk hot-reloading)
 RUN apk add --no-cache git curl && \
-    curl -fLo /usr/local/bin/air https://github.com/cosmtrek/air/releases/latest/download/air_linux_amd64 && \
+    curl -fLo /usr/local/bin/air https://github.com/air-verse/air/releases/download/v1.61.5/air_1.61.5_linux_amd64.tar.gz && \
     chmod +x /usr/local/bin/air
 
 # Set working directory di dalam container
