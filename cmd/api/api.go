@@ -41,7 +41,7 @@ func (s *APIServer) Run() error {
 	folderHandler.FolderRoutes(subrouter)
 
 	corsMiddleware := handlers.CORS(
-		handlers.AllowedOrigins([]string{"http://127.0.0.1:5500"}), // Pastikan domain sesuai
+		handlers.AllowedOrigins([]string{"*"}),
 		handlers.AllowedMethods([]string{"GET", "POST", "PUT", "DELETE", "OPTIONS"}),
 		handlers.AllowedHeaders([]string{"Content-Type", "Authorization"}),
 	)
