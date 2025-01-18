@@ -1,5 +1,10 @@
 # Menggunakan image Go resmi sebagai base image
-FROM golang:1.23-alpine AS builder
+FROM golang:1.23-alpine
+
+# Install dependencies dan air (alat untuk hot-reloading)
+RUN apk add --no-cache git curl && \
+    curl -fLo /usr/local/bin/air https://github.com/cosmtrek/air/releases/latest/download/air_linux_amd64 && \
+    chmod +x /usr/local/bin/air
 
 # Set working directory di dalam container
 WORKDIR /app
@@ -11,15 +16,5 @@ RUN go mod tidy
 # Menyalin seluruh file proyek ke dalam container
 COPY . .
 
-# Membuat aplikasi Go
-RUN go build -o app .
-
-# Menyusun image final untuk aplikasi Go
-FROM alpine:latest
-
-# Menyalin file aplikasi dari stage sebelumnya
-WORKDIR /root/
-COPY --from=builder /app/app .
-
-# Set perintah untuk menjalankan aplikasi
-CMD ["./app"]
+# Perintah untuk menjalankan air yang akan memantau perubahan file
+CMD ["air"]
