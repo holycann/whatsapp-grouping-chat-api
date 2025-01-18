@@ -15,3 +15,9 @@ migrate-up:
 
 migrate-down:
 	@go run db/migrate/migrate.go down
+
+docker-up:
+	docker-compose up --build
+
+docker-down:
+	docker-compose down
