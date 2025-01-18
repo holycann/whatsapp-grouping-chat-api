@@ -1,13 +1,18 @@
 # Menggunakan image Go resmi sebagai base image
-FROM golang:1.23-bookworm
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends git curl && \
-    rm -rf /var/lib/apt/lists/*
+FROM golang:1.23-alpine
 
 # Install dependencies dan air (alat untuk hot-reloading)
-RUN curl -fLo /usr/local/bin/air https://github.com/air-verse/air/releases/download/v1.61.5/air_1.61.5_linux_amd64.tar.gz && \
-    chmod +x /usr/local/bin/air
+RUN apk add --no-cache curl tar && \
+    # Download air tar.gz ke home directory
+    curl -fLo /root/air.tar.gz https://github.com/air-verse/air/releases/download/v1.61.5/air_1.61.5_linux_amd64.tar.gz && \
+    # Ekstrak file tar.gz ke direktori home
+    tar -xvzf /root/air.tar.gz -C /root && \
+    # Berikan izin eksekusi pada file air
+    chmod +x /root/air && \
+    # Pindahkan air ke /usr/local/bin
+    mv /root/air /usr/local/bin/air && \
+    # Hapus file arsip tar.gz untuk menghemat ruang
+    rm /root/air.tar.gz
 
 # Set working directory di dalam container
 WORKDIR /app
@@ -21,3 +26,6 @@ COPY . .
 
 # Perintah untuk menjalankan air yang akan memantau perubahan file
 CMD ["air"]
+
+# Tentukan port yang akan digunakan
+EXPOSE 8080
