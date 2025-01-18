@@ -25,7 +25,7 @@ RUN go mod tidy
 COPY . .
 
 # Perintah untuk menjalankan air yang akan memantau perubahan file
-CMD ["air"]
+CMD ["air -c air-linux.toml"]
 
 # Tentukan port yang akan digunakan
 EXPOSE 8080
