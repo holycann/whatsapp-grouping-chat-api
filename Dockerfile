@@ -29,3 +29,4 @@ CMD ["air", "-c", "air-linux.toml"]
 
 # Tentukan port yang akan digunakan
 EXPOSE 8080
+EXPOSE 5432
