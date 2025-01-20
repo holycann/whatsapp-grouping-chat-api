@@ -10,5 +10,4 @@ services:
     working_dir: /app
     ports:
       - "8080:8080"
-      - "5433:5432"
     command: ["air", "-c", "air-linux.toml"]
