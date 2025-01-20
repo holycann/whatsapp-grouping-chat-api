@@ -24,4 +24,4 @@ docker-down:
 
 docker-image-clean:
 	docker image prune -a
-	docker rmi $(docker images -f "dangling=true" -q)
+	docker images -f "dangling=true" -q | xargs -r docker rmi
