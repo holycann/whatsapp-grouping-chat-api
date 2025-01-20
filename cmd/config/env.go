@@ -19,14 +19,15 @@ var Env = initConfigProduction()
 
 func initConfigProduction() Config {
 	return Config{
-		PublicHost: getEnv("PUBLIC_HOST", "https://wise-sheena-holycan-e9914987.koyeb.app"),
+		PublicHost: getEnv("PUBLIC_HOST", "https://api.holyycan.com"),
 		Port:       getEnv("PORT", "8080"),
 		DBAddress: fmt.Sprintf(
-			"postgres://%s:%s@%s/%s",
+			"postgres://%s:%s@%s/%s?sslmode=%s",
 			getEnv("DB_USER", "holycan"),
-			getEnv("DB_PASSWORD", "Vjh38sroTQql"),
-			getEnv("DB_HOST", "ep-mute-forest-a1sttr12.ap-southeast-1.pg.koyeb.app"),
-			getEnv("DB_NAME", "koyebdb"),
+			getEnv("DB_PASSWORD", "ramaa212!"),
+			getEnv("DB_HOST", "localhost:5432"),
+			getEnv("DB_NAME", "wgca"),
+			getEnv("SSL_MODE", "disable"),
 		),
 		MaxOpenConns: getEnvAsInt("DB_MAX_OPEN_CONNS", 30),
 		MaxIdleConns: getEnvAsInt("DB_MAX_IDLE_CONNS", 30),
