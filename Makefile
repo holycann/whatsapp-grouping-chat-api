@@ -21,3 +21,7 @@ docker-up:
 
 docker-down:
 	docker-compose down
+
+docker-image-clean:
+	docker image prune -a
+	docker rmi $(docker images -f "dangling=true" -q)

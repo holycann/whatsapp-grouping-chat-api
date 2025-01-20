@@ -25,7 +25,7 @@ func initConfigProduction() Config {
 			"postgres://%s:%s@%s/%s?sslmode=%s",
 			getEnv("DB_USER", "holycan"),
 			getEnv("DB_PASSWORD", "ramaa212!"),
-			getEnv("DB_HOST", "host.docker.internal:5432"),
+			getEnv("DB_HOST", "172.17.0.1:5432"),
 			getEnv("DB_NAME", "wgca"),
 			getEnv("SSL_MODE", "disable"),
 		),
